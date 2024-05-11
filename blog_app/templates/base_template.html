@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+        <link rel="stylesheet" href={{url_for('static', filename='../static/style.css')}}>
+        <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">Navbar</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon">
+                    &#9776;
+                </span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav border border-primary m-auto">
+                  <a class="nav-link active" aria-current="page" href="/">Home</a>
+                  <a class="nav-link" href="{{ url_for('latest') }}">Latest</a>
+                  <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                  <a class="nav-link" href="#">Contact</a>
+                </div>
+              </div>
+            </div>
+          </nav>
+    </header>
+    <main>
+      {% block main %}
+                
+      {% endblock %}
+    </main>
+    <footer class="container py-5">
+        <div class="row justify-content-between align-items-center">
+          <div class="col-md-12 col-lg-6">
+            <div class="mx-auto">
+              <h3>Sign Up to our newsletter today</h>
+                <form action="/" class="position-relative">
+                  <div class="input-wrapper w-70">
+                    <input type="email" name="email" id="email" class="w-100">
+                    <button type="submit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+            </div>
+          </div>
+          <div class="col-md-12 col-lg-6 p-4 text-center ">
+            <img src="../static//icon-facebook.svg" alt="facebook" class="m-3">
+            <img src="../static//icon-instagram.svg" alt="instagram" class="m-3">
+            <img src="../static//icon-pinterest.svg" alt="twitter" class="m-3">
+          </div>
+        </div>
+    </footer>
+    {% block script %}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    {% endblock  %}
+</body>
+</html>
