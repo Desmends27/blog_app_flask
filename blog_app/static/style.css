@@ -2,7 +2,7 @@ html, body{
     height: 100vh;
 }
 .custom-container{
-    min-height: 45vh;
+    min-height: 45%;
 }
 .custom-row{
     min-height: 100%;

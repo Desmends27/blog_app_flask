@@ -13,62 +13,33 @@
     </div>
 
     <article class="container my-4 custom-article">
-        <h3 class="text-center">Lorem, ipsum dolor sit amet consectetur </h3>
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Debitis voluptate numquam eligendi voluptatem, velit tempore blanditiis iure. Dolores, cum velit. Ab soluta iusto voluptatibus repudiandae minus deleniti consequatur nulla reprehenderit?
-        Doloremque ullam neque dolore sequi, itaque nostrum vero sed commodi ad omnis voluptatibus maiores ipsa quia, voluptas aspernatur ratione, dolores at voluptatem iusto. Eius accusantium iure ipsam iste asperiores voluptatem.
-        Asperiores maiores libero quia esse dolorum sit nihil reiciendis? Illo, nobis laboriosam. Et ducimus in explicabo optio, animi quo obcaecati voluptas possimus nisi repellendus quam ex? Commodi qui eius atque.
-        Sapiente distinctio ullam assumenda atque fugiat quo harum! Quod alias adipisci ducimus ad fugit quos numquam architecto nam sapiente dolore expedita molestiae, maxime ipsum vero asperiores temporibus vel exercitationem officia!
-        Porro ipsum animi eos? Provident doloremque autem sed enim. Dolorem, aut voluptates modi ipsam hic dolor error minus quidem tempore rem sunt recusandae, maxime nam, iusto debitis unde illo dolore.
-        In sint repellat iste, nesciunt unde minima pariatur nam. Aut architecto delectus sit error quidem molestiae est non dignissimos, autem commodi. Sequi optio adipisci exercitationem aspernatur dolor ducimus omnis reprehenderit.
-        Voluptates possimus nulla placeat qui, tempora ad reprehenderit alias asperiores molestias dolores ex numquam nisi mollitia minima earum neque, magnam quidem iusto. Cumque, molestias iusto aspernatur ab molestiae quisquam voluptas.
-        Voluptatibus aut dolorum, eius minima consequuntur, ipsum ex possimus enim quasi exercitationem suscipit illum iusto molestias aspernatur voluptatem eaque delectus debitis ad assumenda adipisci sequi impedit? Sunt saepe dicta iusto.
-        Quam dolorum nulla quis assumenda voluptatibus exercitationem asperiores ratione, repudiandae rerum! Quo harum esse, possimus nam nostrum est ad nemo amet laboriosam, quis vel assumenda, labore architecto? Accusamus, facere dolorum.
-        Laudantium repellat vitae voluptates doloremque labore, quisquam neque modi, accusamus iusto, eum odio. Ratione laboriosam quasi ipsa rem porro veniam ipsum eligendi accusamus quia perspiciatis culpa quaerat, vel, dicta commodi.
+        <h3 class="text-center">{{ articles[id]['title'] }}</h3>
+        {{articles[id]['text']}}
     </article>
 
     <div class="container mb-4">
         <h1 class="text-start pl-0">Other Stories</h1>
-      <div class="row">
-        <div class="col-sm-6 col-md-4 pl-0">
-          <div class="card text-left">
-            <img
-              class="card-img-top"
-              src="../../static/images/samurai.jpg"
-              alt="samurai"
-            />
-            <div class="card-body">
-              <h4 class="card-title">British Prime Minister lizzy</h4>
-              <p class="card-text">British Prime minister quits her job</p>
+    <div class="row">
+        {% for article_id, article in articles.items() %}
+        {% if article_id != id %}
+            <div class="col-sm-6 col-md-4 my-4">
+                <a href="/blog/{{article_id}}">
+                    <div class="card text-left">
+                        <img
+                          class="card-img-top"
+                          src="../../static/images/samurai.jpg"
+                          alt="samurai"
+                        />
+                        <div class="card-body">
+                          <h4 class="card-title">{{ articles[article_id]['title']}}</h4>
+                          <p class="card-text">{{ articles[article_id]['description']}}</p>
+                        </div>
+                      </div>
+                </a>
             </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-md-4 pl-0">
-          <div class="card text-left">
-            <img
-              class="card-img-top"
-              src="../../static/images/samurai.jpg"
-              alt="samurai"
-            />
-            <div class="card-body">
-              <h4 class="card-title">British Prime Minister lizzy</h4>
-              <p class="card-text">British Prime minister quits her job</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-md-4 pl-0">
-          <div class="card text-left">
-            <img
-              class="card-img-top"
-              src="../../static/images/samurai.jpg"
-              alt="samurai"
-            />
-            <div class="card-body">
-              <h4 class="card-title">British Prime Minister lizzy</h4>
-              <p class="card-text">British Prime minister quits her job</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        {% endif %}
+        {% endfor %}
+     </div>
     </div>
     {% endblock %} 
     {% block footer %} 
