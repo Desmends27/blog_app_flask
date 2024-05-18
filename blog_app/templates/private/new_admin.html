@@ -1,0 +1,20 @@
+{% extends 'base_template.html' %}
+{% block title %} Admin {%
+    endblock %} 
+{% block main %}
+{% from "private/formhelpers.html" import render_field %}
+<form method="post" class="text-center">
+    {{ form.hidden_tag() }}
+    <dl>
+        {{ render_field(form.username) }}
+        {{ render_field(form.password)}}
+        {{ render_field(form.confirm) }}
+    </dl>
+    <p><input type=submit value=Register>
+</form>
+{% endblock %} 
+{% block footer %} 
+{% endblock %} 
+
+{% block script %}
+{% endblock%}

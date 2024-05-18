@@ -1,0 +1,21 @@
+{% extends 'private/admin_template.html' %} 
+{% block title %} Admin {%
+    endblock %} 
+{% block main %}
+{% from "private/formhelpers.html" import render_field %}
+
+<form method="PATCH" class="container text-center">
+    {{ form.hidden_tag() }}
+    <dl>
+        {{ render_field(form.title) }}
+        {{ render_field(form.description)}}
+        {{ render_field(form.article_text ) }}
+    </dl>
+    <p><input type=submit value=Edit>
+</form>
+{% endblock %} 
+{% block footer %} 
+{% endblock %} 
+
+{% block script %}
+{% endblock%}

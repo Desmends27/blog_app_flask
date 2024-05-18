@@ -4,13 +4,13 @@
         <h1 class="text-start pl-0">Other Stories</h1>
     <div class="row">
         {% for article_id, article in articles.items() %}
-        {% if article_id != id %}
+        {% if article_id != id  and article_id != 'admin' %}
             <div class="col-sm-6 col-md-4 my-4">
-                <a href="/blog/{{article_id}}">
+                <a href="/blog/{{article_id}}" class="text-dark">
                     <div class="card text-left">
                         <img
                           class="card-img-top"
-                          src="../../static/images/samurai.jpg"
+                          src="{{ url_for('static', filename = articles[article_id]['image_path']) }}"
                           alt="samurai"
                         />
                         <div class="card-body">

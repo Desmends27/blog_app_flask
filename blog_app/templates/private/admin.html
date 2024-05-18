@@ -1,0 +1,33 @@
+{% extends 'private/admin_template.html' %}
+
+{% block title %}Admin{% endblock %}
+
+{% block main %}
+<div class="container mb-4">
+    <div class="row">
+        {% for article_id, article in articles.items() %}
+        {% if article_id != 'admin' %}
+            <div class="col-sm-6 col-md-4 my-4">
+                <a href="{{ url_for('admin_blog', id=article_id) }}" class="text-dark">
+                    <div class="card text-left">
+                      <img
+                      class="card-img-top"
+                      src="{{ url_for('static', filename = article['image_path']) }}"
+                      alt="samurai"
+                    />
+                        <div class="card-body">
+                            <h4 class="card-title">{{ article['title'] }}</h4>
+                            <p class="card-text">{{ article['description'] }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block script %}{% endblock %}

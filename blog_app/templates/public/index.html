@@ -4,18 +4,18 @@ endblock %} {% block main %}
   <div class="row custom-row">
     <div class="col-sm-12 col-md-7 p-0 image-container" id="image">
       <img
-        src="../../static/images/samurai.jpg"
-        class="custom-image rounded"
-        alt="samurai"
+      src="{{ url_for('static', filename = articles[latest]['image_path']) }}"
+      class="custom-image rounded"
+      alt="samurai"
       />
     </div>
 
     <div class="col-sm-12 col-md-5 text-start p-4 px-3 align-content-start">
       <h3 class="m-2">
-        <b>{{ articles["1"]['title']}}</b>
+        <b>{{ articles[latest]['title']}}</b>
       </h3>
       <p class="m-2">
-        {{ articles["1"]['description']}}
+        {{ articles[latest]['description']}}
       </p>
     </div>
   </div>
@@ -25,13 +25,13 @@ endblock %} {% block main %}
     <h1 class="text-start pl-0">Other Stories</h1>
 <div class="row">
     {% for article_id, article in articles.items() %}
-    {% if article_id != id %}
+    {% if article_id != id  and article_id != 'admin' %}
         <div class="col-sm-6 col-md-4 my-4">
-            <a href="/blog/{{article_id}}">
+            <a href="/blog/{{article_id}}" class="text-dark">
                 <div class="card text-left">
                     <img
                       class="card-img-top"
-                      src="../../static/images/samurai.jpg"
+                      src="{{ url_for('static', filename = articles[article_id]['image_path']) }}"
                       alt="samurai"
                     />
                     <div class="card-body">

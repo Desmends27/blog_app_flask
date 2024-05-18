@@ -1,75 +1,97 @@
-from blog_app import app
-from flask import render_template
-from flask import url_for
+from blog_app import app, article_dict
+from flask import render_template, url_for, redirect, request, session
+from werkzeug.security import generate_password_hash
+import json
+from wtforms import StringField, PasswordField, TextAreaField, validators
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
+from datetime import datetime
+import uuid
+from flask_wtf.csrf import CSRFProtect
+from functools import wraps
+from config import Config
+from config import ALLOWED_EXTENSIONS
+from werkzeug.utils import secure_filename
+import os
 
-article_dict = {
-  "1": {
-    "title": "The Ultimate Productivity Hack is Saying No",
-    "description": "This article discusses how to be more productive by focusing on what you can control and simply saying no to things that don’t matter.",
-    "date_written": "Not available from this webpage",
-    "text": """
-        In today's interconnected world, technology plays a central role in shaping society. From the way we communicate to how we work, learn, and entertain ourselves, advancements in technology have revolutionized every aspect of our lives.
+app.config.from_object(Config)
+csrf = CSRFProtect(app)
 
-        One of the most significant impacts of technology is its influence on communication. The advent of the internet and social media platforms has transformed how we interact with one another. We can now connect with people from all over the globe instantaneously, share ideas, and access information with unprecedented ease.
+class Registration(FlaskForm):
+    username = StringField("username", [validators.Length(min=4, max=15), validators.DataRequired()])
+    password = PasswordField("password", [
+        validators.Length(min=6, max=14), validators.DataRequired(), validators.EqualTo('confirm', message='Passwords must match')
+    ])
+    confirm = PasswordField("repeat password")
 
-        Technology has also revolutionized the way we work. The rise of remote work and digital nomadism has made it possible for individuals to work from anywhere in the world, breaking down geographical barriers and redefining traditional notions of the workplace.
+class Login(FlaskForm):
+    username = StringField("username", [validators.Length(min=4, max=15), validators.DataRequired()])
+    password = PasswordField("password", [validators.Length(min=6, max=14), validators.DataRequired()])
 
-        In the field of education, technology has opened up new opportunities for learning. Online courses, educational apps, and virtual reality simulations are changing the way we acquire knowledge and skills. Access to educational resources is no longer limited by location or socioeconomic status, empowering people of all backgrounds to pursue their educational goals.
+class Article(FlaskForm):
+    title = StringField('title', [validators.Length(min=10), validators.DataRequired()])
+    description = StringField('description', [validators.Length(min=30), validators.DataRequired()])
+    date = datetime.now().strftime('%d %b %y')
+    article_text = TextAreaField('Text', render_kw={"rows": 20, "cols": 100}, validators=[validators.DataRequired()])
+    file = FileField("image", validators=[validators.DataRequired()])
 
-        The entertainment industry has also been transformed by technology. Streaming services, video games, and augmented reality experiences offer immersive entertainment experiences that were unimaginable just a few decades ago. Technology has democratized content creation, allowing anyone with an internet connection to share their creativity with the world.
+def validate(form):
+    if form['username'] == article_dict['admin']['username'] and form['password'] == article_dict['admin']['password']:
+        return True
+    else:
+        return False
 
-        While the impact of technology on society is undeniably profound, it is not without its challenges. The rise of automation and artificial intelligence threatens to disrupt industries and displace workers. Concerns about privacy, cybersecurity, and the ethical implications of emerging technologies continue to be debated.
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-        Despite these challenges, technology has the potential to bring about positive change and improve the quality of life for people around the world. By harnessing the power of technology responsibly and ethically, we can create a more inclusive, connected, and prosperous society.
-        """
-  },
-  "2": {
-    "title": "A Plastic Ocean: The Devastating Impact on Our Planet",
-    "description": "This article explores the environmental and social consequences of plastic pollution in our oceans.",
-    "date_written": "Not available from this webpage",
-    "text": "Plastic has become an undeniable part of our lives... (refer to previous content for the rest of the article)"
-  },
-  "3": {
-    "title": "The Curious Case of Benjamin Button: Exploring the Science of Aging",
-    "description": "This article delves into the science of aging, using the fictional character Benjamin Button as a springboard for discussion.",
-    "date_written": "Not available from this webpage",
-    "text": "The story of Benjamin Button... (refer to previous content for the rest of the article)"
-  },
-  "4": {
-    "title": "The Power of Curiosity: How It Drives Innovation and Learning",
-    "description": "This article explores the importance of curiosity in driving innovation",
-    "date_written": "Not available from this webpage",
-    "text": "Curiosity is a fundamental human trait that has driven exploration, discovery, and innovation throughout history... (refer to previous content for the rest of the article)"
-  },
-  "5": {
-    "title": "The Rise of Artificial Intelligence: Friend or Foe?",
-    "description": "This article explores the potential benefits and risks of artificial intelligence (AI).",
-    "date_written": "Not available from this webpage",
-    "text": "Artificial intelligence (AI) is rapidly evolving... (refer to previous content for the rest of the article)"
-  },
-  "6": {
-    "title": "The Importance of Sleep for Overall Health and Well-being",
-    "description": "This article discusses the importance of sleep for physical and mental health.",
-    "date_written": "Not available from this webpage",
-    "text": "Sleep is an essential part of life... (refer to previous content for the rest of the article)"
-  },
-  "7": {
-    "title": "The History of Space Exploration: A Journey Among the Stars",
-    "description": "This article explores the history of space exploration, from early dreams to modern missions.",
-    "date_written": "Not available from this webpage",
-    "text": "Space exploration has captivated humanity for centuries. The vastness of space and the mysteries it holds have fueled our imaginations and inspired us to reach for the stars. The history of space exploration is a story of human ingenuity, perseverance, and the desire to push the boundaries of knowledge.  \n\n The first steps towards space exploration were taken centuries ago, with astronomers like Galileo Galilei using telescopes to observe the night sky. In the 20th century, technological advancements made it possible for us to leave Earth's atmosphere and venture into space. The launch of Sputnik 1 by the Soviet Union in 1957 marked the beginning of the Space Age. This was followed by a series of historic achievements, including the first human spaceflight by Yuri Gagarin in 1961 and the first moon landing by Neil Armstrong in 1969.  \n\n Space exploration has not only expanded our understanding of the universe but has also led to many technological advancements that benefit us here on Earth. For example, satellites provide us with communication, navigation, and weather forecasting capabilities. Medical technologies developed for space travel have also improved healthcare on Earth.  \n\n The future of space exploration is full of possibilities. We are planning missions to Mars and beyond, with the goal of one day establishing a human presence on another planet. Space exploration continues to inspire and challenge us, and it holds the promise of unlocking new knowledge and discoveries that will"
-  }
-}
+
+
+def get_latest_item_key(dictionary):
+    latest_date = None
+    latest_key = None
+
+    for key, value in dictionary.items():
+        date_string = value.get('date_written', '')  # Get the date string from the dictionary
+        if date_string:
+            # Convert the date string to a datetime object
+            date = datetime.strptime(date_string, '%d %b %y')
+
+            # Check if the current item is newer than the latest item
+            if latest_date is None or date > latest_date:
+                latest_date = date
+                latest_key = key
+
+    return latest_key
+
+
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' not in session:
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'role' not in session or session['role'] != 'admin':
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route("/")
 def index():
-    print("Hello")
-    return render_template("public/index.html", articles=article_dict)
+    latest = get_latest_item_key(article_dict)
+    return render_template("public/index.html", articles=article_dict, latest=latest)
 
 @app.route("/blog/<id>")
 def read_blog(id):
-   print(id)
-   return render_template("public/blog.html", articles=article_dict, id=id)
+    return render_template("public/blog.html", articles=article_dict, id=id)
 
 @app.route("/about")
 def about():
@@ -78,3 +100,113 @@ def about():
 @app.route("/latest")
 def latest():
     return render_template("public/latest.html", articles=article_dict)
+
+@app.route("/contact")
+def contact():
+    return render_template("public/contact.html")
+
+@app.route("/admin")
+@login_required
+@admin_required
+def admin():
+    return render_template("private/admin.html", articles=article_dict)
+
+@app.route("/admin_login", methods=["POST", "GET"])
+def admin_login():
+    form = Login(request.form)
+    if request.method == "POST" and form.validate():
+        if validate(request.form):
+            session['logged_in'] = True
+            session['role'] = 'admin'  # Set the user role to admin
+            return redirect(url_for('admin'))
+    return render_template("private/admin_login.html", form=form)
+
+@app.route("/new_admin", methods=['POST', 'GET'])
+def new_admin():
+    form = Registration(request.form)
+    if request.method == "POST" and form.validate():
+        article_dict['admin'] = {
+            'username': form.username.data,
+            'password': form.password.data
+        }
+        with open('articles.json', 'w') as fp:
+            json.dump(article_dict, fp)
+        return redirect(url_for('admin_login'))
+    return render_template("private/new_admin.html", form=form)
+
+@app.route("/admin/create_article", methods=["POST", "GET"])
+@login_required
+@admin_required
+def create_article():
+    form = Article()
+    if request.method == "POST" and form.validate_on_submit():
+        if 'file' not in request.files:
+            return 'No file part in request'
+        
+        uploaded_file = request.files['file']
+        
+        if uploaded_file.filename == '':
+            return 'No file selected'
+        
+        if uploaded_file and allowed_file(uploaded_file.filename):
+            filename = secure_filename(uploaded_file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            uploaded_file.save(filepath)
+
+            relative_filepath = "../../static/uploads/" + filename # Store relative path
+
+            article_dict[str(uuid.uuid4())] = {
+                "title": form.title.data,
+                "description": form.description.data,
+                "date_written": form.date,
+                "text": form.article_text.data,
+                "image_path": relative_filepath
+            }
+            with open('articles.json', 'w') as fp:
+                json.dump(article_dict, fp)
+            print(relative_filepath)
+            return redirect(url_for('admin'))
+    return render_template("private/create_article.html", form=form)
+
+from flask import send_from_directory
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route("/admin/blog/<id>")
+@login_required
+@admin_required
+def admin_blog(id):
+    return render_template("private/admin_blog.html", articles=article_dict, id=id)
+
+@app.route("/admin/edit_blog/<id>", methods=['POST', 'GET'])
+@login_required
+@admin_required
+def edit_blog(id):
+    article = Article(request.form)
+    if request.method == "POST" and article.validate():
+        article_dict[id] = {
+            "title": article.title.data,
+            "description": article.description.data,
+            "date_written": article.date,
+            "text": article.article_text.data
+        }
+        with open('articles.json', 'w') as fp:
+            json.dump(article_dict, fp)
+        return redirect(url_for('admin_blog', id=id))
+    else:
+        article.title.data = article_dict[id]['title']
+        article.description.data = article_dict[id]['description']
+        article.article_text.data = article_dict[id]['text']
+    return render_template("private/edit_blog.html", articles=article_dict, id=id, form=article)
+
+@app.route("/admin/delete_blog/<id>")
+@login_required
+@admin_required
+def delete_blog(id):
+    del article_dict[id]
+    with open('articles.json', 'w') as fp:
+        json.dump(article_dict, fp)
+    return redirect(url_for('admin'))

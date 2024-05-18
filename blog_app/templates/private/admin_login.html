@@ -1,0 +1,21 @@
+{% extends 'base_template.html' %}
+{% block title %} Admin {%
+    endblock %} 
+{% block main %}
+{% from "private/formhelpers.html" import render_field %}
+<form method="post" class="text-center">
+    {{ form.hidden_tag() }}
+    <dl>
+        {{ render_field(form.username) }}
+        {{ render_field(form.password)}}
+    </dl>
+    <p><input type=submit value=Register>
+</form>
+<p>Create new admin account</p>
+<a href="{{ url_for('new_admin') }}">Create account</a>
+{% endblock %} 
+{% block footer %} 
+{% endblock %} 
+
+{% block script %}
+{% endblock%}

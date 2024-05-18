@@ -1,0 +1,33 @@
+{% extends 'private/admin_template.html' %} {% block title %} Admin {%
+    endblock %} 
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col-1"><a href="{{ url_for('edit_blog', id= id) }}">Edit</a></div>
+        <div class="col-1"><a href="{{ url_for('delete_blog', id= id) }}">Delete</a></div>
+        
+    </div>
+</div>
+
+<div class="container mt-5 custom-container">
+    <div class="row custom-row border border-primary justify-content-center">
+      <div class="col p-0 image-container " id="image">
+        <img src="{{ url_for('static', filename = articles[id]['image_path']) }}"
+        class="custom-image rounded"
+        alt="samurai"
+        >
+      </div>
+  </div>
+  </div>
+
+  <article class="container my-4 custom-article">
+      <h3 class="text-center">{{ articles[id]['title'] }}</h3>
+      {{articles[id]['text']}}
+  </article>
+
+{% endblock %} 
+{% block footer %} 
+{% endblock %} 
+
+{% block script %}
+{% endblock%}
